@@ -26,7 +26,7 @@ function render(data) {
     document.getElementById('messages').innerHTML = html
 }
 
-function addMessage(e){
+function addMessage(){
     let mensaje = {
         author: document.getElementById('usuario').value,
         text: document.getElementById('texto').value
@@ -35,4 +35,6 @@ function addMessage(e){
 
     document.getElementById('texto').value = ''
     document.getElementById('texto').focus()
+
+    return false
 }
