@@ -1,19 +1,37 @@
 const express = require('express')
 const app = express()
-
-app.set('view engine', 'ejs')
-
-app.set('views', './views')
+const server = require('http').Server(app)
+const io = require('socket.io')(server)
 
 
-app.use(express.json())
-app.use(express.urlencoded({extended:true}))
+// app.set('view engine', 'ejs')
 
+// app.set('views', './views')
+
+// app.use(express.json())
+// app.use(express.urlencoded({extended:true}))
+
+
+
+
+// ------------------------
+
+let messages = []
 
 app.use(express.static('public'))
 
 
-// ------------------------
+
+io.on('connection', function(socket) {
+    console.log('Un cliente se ha conectado')
+    socket.emit('messages', messages); // emitir todos los mesajes a lun cliente nuevo
+
+    socket.on('new-message', function(data) {
+        messages.push(data)
+        io.sockets.emit('messages', messages)
+    })
+});
+
 
 const productos = [{
     "title":"Celular",
@@ -53,14 +71,11 @@ app.post('/productos', (req,res) => {
 
 
 
-
-
-
 const PORT = 8080;
 
-const server = app.listen(PORT, () => {
-    console.log(`servidor escuchando en el puerto ${server.address().port}`)
+const srv = server.listen(PORT, () => {
+    console.log(`servidor escuchando en el puerto ${srv.address().port}`)
 } )
 
 
-server.on('error', error => console.log(`${error}`) )
+srv.on('error', error => console.log(`${error}`) )
