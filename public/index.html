@@ -15,7 +15,7 @@
     <div class="contenedor">
 
         <p class="titulo">Formulario de ingreso de productos</p>
-    <form class="productosingreso" action="/productos" method="POST" >
+    <!-- <form class="productosingreso" action="/productos" method="POST" >
         Nombre: <input type="text" name="title">
         Precio: <input type="text" name="precio">
         URL Foto : <input type="text" name="thumbnail" >
@@ -23,14 +23,25 @@
         <button class="btn btn-primary my-2" > Guardar </button>
 
 
-    </form>
+    </form> -->
 
-    <div class="verProductos">
-        <a  href="http://localhost:8080/productos" > Ver productos </a>
+    <form class="form-inline productosingreso" onsubmit="return addProducto()" autocomplete="off">
+        <input type="text" id="nombre" class="form-control my-2 mr-2" placeholder="Nombre">
+        <input type="text" id="precio" class="form-control my-2 mr-2" placeholder="Precio">
+        <input type="text" id="foto" class="form-control my-2 mr-2" placeholder="Foto url">
+        
+        <input class="btn btn-primary my-2" type="submit" value="Agregar Producto">
+ 
+ 
+     
+     </form>
 
-    </div>
+    <div id="products" ></div>
+
 
     
+    
+    <p class="tituloChat">Chat</p>
 
     <div id="messages" ></div>
 

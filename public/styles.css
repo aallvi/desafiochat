@@ -1,11 +1,26 @@
-body{
-    /* background-color: red!important; */
+html, body{
+    background-color: black;
+    width: 1200px;
+    margin: 0 auto;
+    border-radius: 30px;
+
+
 }
+
+.contenedor{
+    background-color: rgb(244, 237, 237);
+    border: 2px solid aqua;
+    border-radius: 30px;
+    margin: 0 auto;
+    margin-top: 100px;
+    box-shadow: 5px 5px 20px 5px rgba(0,0,0,0.47);
+}
+
 
 #messages{
     width: fit-content;
     margin: 0 auto;
-    margin-top: 200px;
+    margin-top: 100px;
 }
 
 .contenedorChat{
@@ -17,19 +32,17 @@ body{
     margin-bottom: 40px;
 }
 
-.contenedor{
-    background-color: rgb(202, 196, 196);
-    border-radius: 5px;
-    width: 1200px;
-    margin: 0 auto;
-    margin-top: 100px;
-    box-shadow: 5px 5px 20px 5px rgba(0,0,0,0.47);
-}
 
 
 .titulo{
     text-align: center;
     font-size: 25px;
+    margin-top: 20px;
+}
+.tituloChat{
+    text-align: center;
+    font-size: 25px;
+    margin-top: 80px;
 }
 
 .productosingreso{
@@ -41,4 +54,35 @@ body{
     width: fit-content;
     margin: 0 auto;
   
+}
+
+.textoChatContenedor{
+    width: 400px;
+}
+
+
+.textoChat{
+    color: green;
+    text-decoration: none;
+    font-style: normal;
+    text-overflow: ellipsis;
+    word-wrap: break-word;
+    overflow: hidden;
+    max-height: 3.6em;
+    line-height: 1.8em;
+}
+
+
+.productosContenedor{
+    width: fit-content;
+    display: flex;
+    flex-direction: row;
+    margin: 0 auto;
+    align-items: center;
+}
+.productosContenedor p{
+    margin-right: 10px;
+}
+.productosContenedor img{
+    border-radius: 5px;
 }

@@ -20,15 +20,38 @@ let messages = []
 
 app.use(express.static('public'))
 
+let products = []
+
 
 
 io.on('connection', function(socket) {
-    console.log('Un cliente se ha conectado')
+    console.log('Un cliente se ha conectado al chat')
     socket.emit('messages', messages); // emitir todos los mesajes a lun cliente nuevo
 
     socket.on('new-message', function(data) {
         messages.push(data)
         io.sockets.emit('messages', messages)
+    })
+
+
+    // console.log('Un cliente se ha conectado')
+    // socket.emit('products', products); // emitir todos los mesajes a lun cliente nuevo
+
+    // socket.on('new-product', function(dataProduct) {
+    //     products.push(dataProduct)
+    //     io.sockets.emit('products', products)
+    // })
+});
+
+
+io.on('connection', function(socket) {
+
+    console.log('Un cliente se ha conectado')
+    socket.emit('products', products); // emitir todos los mesajes a lun cliente nuevo
+
+    socket.on('new-product', function(dataProduct) {
+        products.push(dataProduct)
+        io.sockets.emit('products', products)
     })
 });
 
