@@ -3,13 +3,10 @@ const app = express()
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
 
+// Comentar una de las siguientes para probar el funcionamiento de la otra, sqlite y mysql
 
-// app.set('view engine', 'ejs')
-
-// app.set('views', './views')
-
-// app.use(express.json())
-// app.use(express.urlencoded({extended:true}))
+// const {knex} = require('./db/database')
+const {knex} = require('./db/dbsqlite')
 
 
 
@@ -20,39 +17,163 @@ let messages = []
 
 app.use(express.static('public'))
 
-let products = []
+
+const mensa = {mensaje:'hola'}
+
+const insertPrueba = async () =>{
+    try {
+        const mensaje =  await knex('messages').insert(mensa)
+
+       console.log(mensaje)
+
+    //    console.log({productos})
+            
+
+    } catch (e) {
+        return e;
+    }
+}
+
+const getMensajes = async () =>{
+    try {
+       return await knex.from('messages').select('*') 
+
+    //    console.log({productos})
+            
+
+    } catch (e) {
+        return e;
+    }
+}
+
+const insertMensajes = async (data) =>{
+    try {
+       const mensaje =  await knex('messages').insert(data)
+
+       console.log(mensaje)
+            
+
+    } catch (e) {
+        return e;
+    }
+}
 
 
 
-io.on('connection', function(socket) {
+
+
+io.on('connection', async (socket) => {
     console.log('Un cliente se ha conectado al chat')
-    socket.emit('messages', messages); // emitir todos los mesajes a lun cliente nuevo
+    // socket.emit('messages', messages); // emitir todos los mesajes a lun cliente nuevo
 
-    socket.on('new-message', function(data) {
-        messages.push(data)
-        io.sockets.emit('messages', messages)
+    socket.emit('messages',  await getMensajes())
+
+    console.log(await getMensajes())
+
+    // socket.on('new-message', function(data) {
+    //     messages.push(data)
+    //     io.sockets.emit('messages', messages)
+    // })
+
+    socket.on('new-message',  async (data)=> {
+     
+        await insertMensajes(data)
+
+        console.log('lo que llega',data)
+
+
+        socket.emit('messages',  await getMensajes())// emitir todos los mesajes a lun cliente nuevo
+
+
     })
 
 
-    // console.log('Un cliente se ha conectado')
-    // socket.emit('products', products); // emitir todos los mesajes a lun cliente nuevo
 
-    // socket.on('new-product', function(dataProduct) {
-    //     products.push(dataProduct)
-    //     io.sockets.emit('products', products)
-    // })
 });
 
 
-io.on('connection', function(socket) {
+
+
+
+
+
+
+
+
+
+
+
+
+const getProducts = async () =>{
+    try {
+       return  await knex.from('products').select('*')
+
+       console.log({productos})
+            
+
+    } catch (e) {
+        return e;
+    }
+}
+
+const insertProducts = async (data) =>{
+    try {
+       const productos =  await knex('products').insert(data)
+
+       console.log(productos)
+            
+
+    } catch (e) {
+        return e;
+    }
+}
+
+
+io.on('connection',  async (socket) => {
 
     console.log('Un cliente se ha conectado')
-    socket.emit('products', products); // emitir todos los mesajes a lun cliente nuevo
 
-    socket.on('new-product', function(dataProduct) {
-        products.push(dataProduct)
-        io.sockets.emit('products', products)
+
+
+    socket.emit('products',  await getProducts())// emitir todos los mesajes a lun cliente nuevo
+
+  
+
+    socket.on('new-product',  async (dataProduct)=> {
+     
+        await insertProducts(dataProduct)
+
+
+        socket.emit('products',  await getProducts())// emitir todos los mesajes a lun cliente nuevo
+
+
+
+        
+        // knex.from('productos').select('*')
+        // .then(rows => {
+        //     for (row of rows){
+        //         products.push({id: `${row['id']}`, nombre:`${row['nombre']}`, precio:`${row['precio']}`})
+        //         io.sockets.emit('products', products)
+
+        //     }
+        //     console.log(products)
+        // io.sockets.emit('products', products)
+
+        // } ).catch(err => {console.log(err); throw err })
+        // .finally(() => {
+        //     knex.destroy()
+        // } )
+
     })
+
+
+
+
+
+
+
+
+
 });
 
 

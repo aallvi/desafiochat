@@ -7,9 +7,11 @@ console.log(fecha.toLocaleString())
 
 let socket = io.connect();
 socket.on('messages', function(data){
-    console.log(data);
+    console.log('y esto',data);
     render(data);
 })
+
+
 socket.on('products', function(dataProduct){
     console.log('dataproductos',dataProduct);
     renderProducto(dataProduct);
@@ -37,7 +39,7 @@ function render(data) {
         return(
             `<div class="textoChatContenedor" >
             <strong>${elem.author}</strong> <em>${fecha.toLocaleString()} </em> :
-            <em class="textoChat" >${elem.text}</em>
+            <em class="textoChat" >${elem.mensaje}</em>
             </div>`
         )
     }).join(" ");
@@ -46,8 +48,8 @@ function render(data) {
 
 function addMessage(){
     let mensaje = {
-        author: document.getElementById('usuario').value,
-        text: document.getElementById('texto').value
+        // author: document.getElementById('usuario').value,
+        mensaje: document.getElementById('texto').value
     };
     socket.emit('new-message', mensaje)
 
