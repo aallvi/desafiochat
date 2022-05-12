@@ -5,8 +5,8 @@ const io = require('socket.io')(server)
 
 // Comentar una de las siguientes para probar el funcionamiento de la otra, sqlite y mysql
 
-// const {knex} = require('./db/database')
-const {knex} = require('./db/dbsqlite')
+const {knex} = require('./db/database')
+// const {knex} = require('./db/dbsqlite')
 
 
 
@@ -62,34 +62,34 @@ const insertMensajes = async (data) =>{
 
 
 
-io.on('connection', async (socket) => {
-    console.log('Un cliente se ha conectado al chat')
-    // socket.emit('messages', messages); // emitir todos los mesajes a lun cliente nuevo
+// io.on('connection', async (socket) => {
+//     console.log('Un cliente se ha conectado al chat')
+//     // socket.emit('messages', messages); // emitir todos los mesajes a lun cliente nuevo
 
-    socket.emit('messages',  await getMensajes())
+//     socket.emit('messages',  await getMensajes())
 
-    console.log(await getMensajes())
+//     console.log(await getMensajes())
 
-    // socket.on('new-message', function(data) {
-    //     messages.push(data)
-    //     io.sockets.emit('messages', messages)
-    // })
+//     // socket.on('new-message', function(data) {
+//     //     messages.push(data)
+//     //     io.sockets.emit('messages', messages)
+//     // })
 
-    socket.on('new-message',  async (data)=> {
+//     socket.on('new-message',  async (data)=> {
      
-        await insertMensajes(data)
+//         await insertMensajes(data)
 
-        console.log('lo que llega',data)
-
-
-        socket.emit('messages',  await getMensajes())// emitir todos los mesajes a lun cliente nuevo
+//         console.log('lo que llega',data)
 
 
-    })
+//         socket.emit('messages',  await getMensajes())// emitir todos los mesajes a lun cliente nuevo
+
+
+//     })
 
 
 
-});
+// });
 
 
 
