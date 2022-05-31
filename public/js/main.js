@@ -38,7 +38,7 @@ function render(data) {
     const html = data.map(function(elem, index){
         return(
             `<div class="textoChatContenedor" >
-            <strong>${elem.author}</strong> <em>${fecha.toLocaleString()} </em> :
+            <strong>${elem.author.nombre}</strong> <em>${fecha.toLocaleString()} </em> :
             <em class="textoChat" >${elem.mensaje}</em>
             </div>`
         )
@@ -47,11 +47,19 @@ function render(data) {
 }
 
 function addMessage(){
-    let mensaje = {
-        // author: document.getElementById('usuario').value,
-        mensaje: document.getElementById('texto').value
+    let mensajeObj = {
+        author:{
+         id:document.getElementById('id').value,
+         nombre:document.getElementById('name').value,
+         apellido:document.getElementById('apellido').value,
+         edad:document.getElementById('edad').value,
+         alias:document.getElementById('alias').value,
+         avatar:document.getElementById('avatar').value,
+        },
+       
+        mensaje: document.getElementById('men').value
     };
-    socket.emit('new-message', mensaje)
+    socket.emit('new-message', mensajeObj)
 
     document.getElementById('texto').value = ''
     document.getElementById('texto').focus()

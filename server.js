@@ -1,44 +1,59 @@
 const express = require('express')
 const app = express()
+require('dotenv').config()
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
-
+const cors = require('cors');
+const { faker } = require('@faker-js/faker');
+faker.locale = 'es'
 // Comentar una de las siguientes para probar el funcionamiento de la otra, sqlite y mysql
+const routerProductos = express.Router()
 
-const {knex} = require('./db/database')
-// const {knex} = require('./db/dbsqlite')
+// const {knex} = require('./db/database')
+const {knex} = require('./db/dbsqlite')
+const ContenedorMongoDb = require('./contenedores/ContenedorMongoDb')
+const ContenedorFirebase = require('./contenedores/ContenedorFirebase')
+
+let envVars = process.env.DATABASE
+app.use('/api/productos-test', routerProductos)
 
 
+routerProductos.use(express.json())
+routerProductos.use(express.urlencoded({extended:true}))
 
+const conector = envVars === 'FIREBASE' ? new ContenedorFirebase() : envVars === 'MONGO' ? new ContenedorMongoDb() : null
+
+conector.connect()
 
 // ------------------------
 
-let messages = []
+
 
 app.use(express.static('public'))
 
 
-const mensa = {mensaje:'hola'}
+// const author = new schema.Entity('author')
 
-const insertPrueba = async () =>{
-    try {
-        const mensaje =  await knex('messages').insert(mensa)
+// const mensaje = new schema.Entity('mensajes', {
+//     escritor: author
+// })
 
-       console.log(mensaje)
+// const messages = new schema.Entity('post', {
+//     author: author,
+//     mensajes:[mensaje] 
+// })
 
-    //    console.log({productos})
-            
+// const chat = new schema.Entity('post',{
+//     chat:messages
+// })
 
-    } catch (e) {
-        return e;
-    }
-}
+let messages = []
 
 const getMensajes = async () =>{
     try {
-       return await knex.from('messages').select('*') 
-
-    //    console.log({productos})
+    //    return await knex.from('messages').select('*') 
+     return conector.getAll()
+       
             
 
     } catch (e) {
@@ -48,9 +63,11 @@ const getMensajes = async () =>{
 
 const insertMensajes = async (data) =>{
     try {
-       const mensaje =  await knex('messages').insert(data)
+    //    const mensaje =  await knex('messages').insert(data)
 
-       console.log(mensaje)
+       conector.postMensaje(data)
+
+       console.log('data',data)
             
 
     } catch (e) {
@@ -62,36 +79,34 @@ const insertMensajes = async (data) =>{
 
 
 
-// io.on('connection', async (socket) => {
-//     console.log('Un cliente se ha conectado al chat')
-//     // socket.emit('messages', messages); // emitir todos los mesajes a lun cliente nuevo
+io.on('connection', async (socket) => {
+    console.log('Un cliente se ha conectado al chat')
+    // socket.emit('messages', messages); // emitir todos los mesajes a lun cliente nuevo
 
-//     socket.emit('messages',  await getMensajes())
+    socket.emit('messages',  await getMensajes())
 
-//     console.log(await getMensajes())
+    console.log(await getMensajes())
 
-//     // socket.on('new-message', function(data) {
-//     //     messages.push(data)
-//     //     io.sockets.emit('messages', messages)
-//     // })
+    socket.on('new-message', function(data) {
+        messages.push(data)
+        io.sockets.emit('messages', messages)
+    })
 
-//     socket.on('new-message',  async (data)=> {
+    socket.on('new-message',  async (data)=> {
      
-//         await insertMensajes(data)
+        await insertMensajes(data)
 
-//         console.log('lo que llega',data)
-
-
-//         socket.emit('messages',  await getMensajes())// emitir todos los mesajes a lun cliente nuevo
+        console.log('lo que llega',data)
 
 
-//     })
+        socket.emit('messages',  await getMensajes())// emitir todos los mesajes a lun cliente nuevo
+
+
+    })
 
 
 
-// });
-
-
+});
 
 
 
@@ -99,6 +114,28 @@ const insertMensajes = async (data) =>{
 
 
 
+
+routerProductos.get('/',cors(), async (req,res) => {
+    
+    let respuesta = [{
+        nombre:'',
+        precio:faker.commerce.price(100)
+    }]
+
+    for (let i = 0; i < 5; i++) {
+         respuesta[i]= {
+             nombre:faker.commerce.product(),
+             precio:faker.commerce.price(100),
+             foto:faker.image.imageUrl()
+
+        }
+        
+    }
+
+    res.json(respuesta)
+
+  
+} )
 
 
 
@@ -129,44 +166,42 @@ const insertProducts = async (data) =>{
 }
 
 
-io.on('connection',  async (socket) => {
+// io.on('connection',  async (socket) => {
 
-    console.log('Un cliente se ha conectado')
+//     console.log('Un cliente se ha conectado')
 
 
 
-    socket.emit('products',  await getProducts())// emitir todos los mesajes a lun cliente nuevo
+//     socket.emit('products',  await getProducts())// emitir todos los mesajes a lun cliente nuevo
 
   
 
-    socket.on('new-product',  async (dataProduct)=> {
+//     socket.on('new-product',  async (dataProduct)=> {
      
-        await insertProducts(dataProduct)
+//         await insertProducts(dataProduct)
 
 
-        socket.emit('products',  await getProducts())// emitir todos los mesajes a lun cliente nuevo
+//         socket.emit('products',  await getProducts())// emitir todos los mesajes a lun cliente nuevo
 
 
 
         
-        // knex.from('productos').select('*')
-        // .then(rows => {
-        //     for (row of rows){
-        //         products.push({id: `${row['id']}`, nombre:`${row['nombre']}`, precio:`${row['precio']}`})
-        //         io.sockets.emit('products', products)
+//         // knex.from('productos').select('*')
+//         // .then(rows => {
+//         //     for (row of rows){
+//         //         products.push({id: `${row['id']}`, nombre:`${row['nombre']}`, precio:`${row['precio']}`})
+//         //         io.sockets.emit('products', products)
 
-        //     }
-        //     console.log(products)
-        // io.sockets.emit('products', products)
+//         //     }
+//         //     console.log(products)
+//         // io.sockets.emit('products', products)
 
-        // } ).catch(err => {console.log(err); throw err })
-        // .finally(() => {
-        //     knex.destroy()
-        // } )
+//         // } ).catch(err => {console.log(err); throw err })
+//         // .finally(() => {
+//         //     knex.destroy()
+//         // } )
 
-    })
-
-
+//     })
 
 
 
@@ -174,7 +209,9 @@ io.on('connection',  async (socket) => {
 
 
 
-});
+
+
+// });
 
 
 const productos = [{
