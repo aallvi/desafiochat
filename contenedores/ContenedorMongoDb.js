@@ -4,16 +4,9 @@ const util = require('util')
  
 const {normalize, denormalize, schema} = require('normalizr')
 
-const user = new schema.Entity('users')
+const authorsSchema = new schema.Entity('author');
 
-const comment = new schema.Entity('comments', {
-    commenter: user
-  })
-
-  const article = new schema.Entity('articles', {
-    comments: [comment],
-    author: user
-  })
+const msjSchema = new schema.Entity('mensajes', { author: authorsSchema }, { idAttribute: '_id' });
 
 
 
@@ -41,7 +34,7 @@ class ContenedorMongoDb {
             let mensajes = await mensajesModel.find()
             // console.log(mensajes)
 
-            const normalizaChat = normalize(mensajes,article)
+            const normalizaChat = normalize(mensajes,msjSchema)
             print(normalizaChat)
 
             const longO = JSON.stringify(mensajes).length
