@@ -34,16 +34,6 @@ class ContenedorMongoDb {
             let mensajes = await mensajesModel.find()
             // console.log(mensajes)
 
-            const normalizaChat = normalize(mensajes,msjSchema)
-            print(normalizaChat)
-
-            const longO = JSON.stringify(mensajes).length
-            console.log('objeto original', longO)
-
-            const longN = JSON.stringify(normalizaChat).length
-            console.log('objeto  normalizado', longN)
-
-
           
             return mensajes
             // return JSON.parse(productos)

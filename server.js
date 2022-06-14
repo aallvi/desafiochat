@@ -6,8 +6,11 @@ const io = require('socket.io')(server)
 const cors = require('cors');
 const { faker } = require('@faker-js/faker');
 faker.locale = 'es'
+const session = require('express-session')
+const MongoStore = require('connect-mongo')
 // Comentar una de las siguientes para probar el funcionamiento de la otra, sqlite y mysql
 const routerProductos = express.Router()
+// const cors = require('cors');
 
 // const {knex} = require('./db/database')
 const {knex} = require('./db/dbsqlite')
@@ -32,20 +35,24 @@ conector.connect()
 app.use(express.static('public'))
 
 
-// const author = new schema.Entity('author')
+app.use(session({
+    /* ----------------------------------------------------- */
+    /*           Persistencia por redis database             */
+    /* ----------------------------------------------------- */
+    // Para Mongo Atlas cambiar URL por la del cluster de atlas
+    store: MongoStore.create({ mongoUrl: 'mongodb://localhost/sesiones' }),
+    /* ----------------------------------------------------- */
 
-// const mensaje = new schema.Entity('mensajes', {
-//     escritor: author
-// })
+    secret: 'shhhhhhhhhhhhhhhhhhhhh',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        maxAge: 40000
+    } 
+}))
 
-// const messages = new schema.Entity('post', {
-//     author: author,
-//     mensajes:[mensaje] 
-// })
 
-// const chat = new schema.Entity('post',{
-//     chat:messages
-// })
+
 
 let messages = []
 
@@ -67,7 +74,7 @@ const insertMensajes = async (data) =>{
 
        conector.postMensaje(data)
 
-       console.log('data',data)
+    //    console.log('data',data)
             
 
     } catch (e) {
@@ -85,7 +92,7 @@ io.on('connection', async (socket) => {
 
     socket.emit('messages',  await getMensajes())
 
-    console.log(await getMensajes())
+    // console.log(await getMensajes())
 
     socket.on('new-message', function(data) {
         messages.push(data)
@@ -96,7 +103,7 @@ io.on('connection', async (socket) => {
      
         await insertMensajes(data)
 
-        console.log('lo que llega',data)
+        // console.log('lo que llega',data)
 
 
         socket.emit('messages',  await getMensajes())// emitir todos los mesajes a lun cliente nuevo
@@ -108,11 +115,94 @@ io.on('connection', async (socket) => {
 
 });
 
+// -----------------------------------DESAFIO LOGIN--------------------------------------------
+
+
+
+app.get('/servidor', (req,res) => {
+    res.send('servidor ok')
+} )
+
+// let contador = 0
+// app.get('/sin-session', (req, res) => {
+//     res.send({ contador: ++contador })
+// })
+
+app.get('/con-session', (req, res) => {
+    if (req.session.contador) {
+        req.session.contador++
+        res.send(`Ud ha visitado el sitio ${req.session.contador} veces.`)
+    }
+    else {
+        req.session.contador = 1
+        res.send('Bienvenido!')
+    }
+})
+
+app.get('/nombreUsuario',cors(), (req,res) => {
+  
+    if(req.session.usuario){
+        res.json({nombre:req.session.usuario})
+
+
+    } else {
+        res.json('no logeado')
+    }
+
+})
+
+// let login = 0
+
+app.get('/login/:nombre', (req, res) => {
+
+    console.log(req.params.nombre)
+
+    
+
+    if (req.session.login) {
+      
+
+        res.send(`estas logeado? ${req.session.login}`)
+        // res.json('logeado')
+        
+          
+    }
+    else {
+        req.session.login = true
+        req.session.usuario= req.params.nombre
+        // res.send(`Bienvenido ${req.params.nombre} , estas logeado`)
+        res.send(`Bienvenido ${req.params.nombre} , estas logeado <a href="http://localhost:8080/" > volver </a> `)
+
+        
+    }
+})
+
+app.get('/logout', (req, res) => {
+
+   let nombre =  req.session.usuario
+
+    req.session.destroy(err => {
+        if (!err) res.send(` ${nombre} estas desconectad@ <a href="http://localhost:8080/" > volver </a> `)
+        else res.send({ status: 'Logout ERROR', body: err })
+    })
+})
+
+app.get('/home', (req, res) => {
+    if (req.session.login) {
+        res.send(`Bienvenido! ${req.session.usuario} ESTAS LOGEADO`)
+
+        console.log('viene')
+    } else {
+       res.send('no estas logeado')
+    }
+    
+})
 
 
 
 
 
+// -----------------------------------------------------------------------------
 
 
 routerProductos.get('/',cors(), async (req,res) => {
@@ -133,6 +223,8 @@ routerProductos.get('/',cors(), async (req,res) => {
     }
 
     res.json(respuesta)
+
+ 
 
   
 } )

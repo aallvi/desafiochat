@@ -86,3 +86,13 @@ html, body{
 .productosContenedor img{
     border-radius: 5px;
 }
+
+.login {
+    width: fit-content;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: row;
+
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
