@@ -1,18 +1,112 @@
 
 
-const valor = document.getElementById("texto")
 
-valor.addEventListener('keyup', (event) => {
-    var inputText =event.path[0].value
 
-    console.log(inputText)
+// const nombre = document.getElementById("nombre").value
+// const clave = document.getElementById("clave").value
+const myBtn = document.getElementById("myBtn")
 
-    document.querySelector('#enlaceLogin').innerHTML= `<a href="http://localhost:8080/login/${inputText}" > Entra </a>`
+myBtn.addEventListener('click', function() {
+    // var inputText =event.path[0].value
+
+    // console.log(document.getElementById("clave").value)
+    // console.log(document.getElementById("nombre").value)
+
+    let nombre = document.getElementById("nombre").value
+    let clave = document.getElementById("clave").value
+   
+
+
+    console.log(nombre)
+    console.log(clave)
+
+    let usuario = {
+      username: nombre,
+      password: clave
+    }
+
+ 
+
+    fetch(`http://localhost:8080/register`,
+    {   
+    method: "POST",
+    body: JSON.stringify(usuario),
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      
+  
+  })
+    .then(response => {
+      console.log(response)
+
+      
+    
+    } ).then( window.location.href("http://localhost:8080/home") )
+   
+    
+    
+    .catch(err => console.log(err) );
+
+    // document.querySelector('#enlaceLogin').innerHTML= `<a href="http://localhost:8080/register/${inputText}/${clave}" > Entra </a>`
 
 } )
 
+const myBtnInicio = document.getElementById("myBtnInicio")
+
+myBtnInicio.addEventListener('click', function() {
+    // var inputText =event.path[0].value
+
+    // console.log(document.getElementById("clave").value)
+    // console.log(document.getElementById("nombre").value)
+
+    let nombre = document.getElementById("textoLogin").value
+    let clave = document.getElementById("claveLogin").value
+   
+
+
+    console.log(nombre)
+    console.log(clave)
+
+    let usuario = {
+      username: nombre,
+      password: clave
+    }
+
+ 
+
+    fetch(`http://localhost:8080/login`,
+    {   
+    method: "POST",
+    body: JSON.stringify(usuario),
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      
+  
+  })
+    .then(response => {
+      console.log(response)
+
+      
+    
+    } ).then( window.location.href("http://localhost:8080/home") )
+   
+    
+    
+    .catch(err => console.log(err) );
+
+    // document.querySelector('#enlaceLogin').innerHTML= `<a href="http://localhost:8080/register/${inputText}/${clave}" > Entra </a>`
+
+} )
+
+
+
+
 // console.log(valor)
-    const enlace = `<a href="http://localhost:8080/login/${valor}" > Entra </a> `
+ 
 
     // document.getElementById('enlaceLogin').appendChild(enlace)
   
@@ -25,38 +119,12 @@ valor.addEventListener('keyup', (event) => {
     // element.appendChild(para);
   
 
-    document.querySelector('#enlaceLogin').innerHTML= '<a href="http://localhost:8080/login/${valor}" > Entra </a>'
+   
+    // document.querySelector('#enlaceRegister').innerHTML= '<a href="http://localhost:8080/register" > Registrate </a> '
 
 // let fecha = new Date()
 
-const obtenerNombre = () => {
 
-  let usuario = {nombre:'nada'}
-
-  fetch('http://localhost:8080/nombreUsuario')
-  .then(response => response.json())
-  .then(data => {
-     if(data.nombre){
-      document.querySelector('#enlaceLogin').innerHTML= `<p > Hola ${data.nombre}  </p>`
-      document.querySelector('#texto').remove()
-      document.querySelector('#nombreinput').remove()
-      document.querySelector('#salir').innerHTML= `<a href="http://localhost:8080/logout" > salir </a>`
-
-
-     } else {
-      console.log(data)
-     }
-
-
-  }
-  
-  ).catch(err => console.log(err));
-    
-
-
-}
-
-obtenerNombre()
 
 
 

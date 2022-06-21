@@ -94,5 +94,14 @@ html, body{
     flex-direction: row;
 
     margin-top: 20px;
-    margin-bottom: 20px;
+    margin-bottom: 60px;
+}
+
+.titulo{
+    text-align: center;
+    /* margin-bottom: 5rem; */
+}
+
+.bienvenido{
+    font-size: 2rem;
 }

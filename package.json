@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@faker-js/faker": "^7.1.0",
+    "bcrypt": "^5.0.1",
     "connect-mongo": "^4.6.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
@@ -26,6 +27,8 @@
     "mongoose": "^6.3.4",
     "mysql": "^2.18.1",
     "normalizr": "^3.6.2",
+    "passport": "^0.6.0",
+    "passport-local": "^1.0.0",
     "pug": "^3.0.2",
     "random": "^3.0.6",
     "socket.io": "^4.4.1",

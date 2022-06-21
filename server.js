@@ -6,23 +6,44 @@ const io = require('socket.io')(server)
 const cors = require('cors');
 const { faker } = require('@faker-js/faker');
 faker.locale = 'es'
+
 const session = require('express-session')
-const MongoStore = require('connect-mongo')
 // Comentar una de las siguientes para probar el funcionamiento de la otra, sqlite y mysql
 const routerProductos = express.Router()
-// const cors = require('cors');
 
+
+const passport = require('passport')
+const {Strategy: LocalStrategy} = require('passport-local')
+
+
+app.use(session({
+    secret:'shhhhhhhhhhhh',
+    resave:false,
+    saveUninitialized:false,
+    cookie: {
+        maxAge: 6000
+    }
+}))
+
+
+
+app.use(passport.initialize())
+app.use(passport.session())
 // const {knex} = require('./db/database')
-const {knex} = require('./db/dbsqlite')
+
 const ContenedorMongoDb = require('./contenedores/ContenedorMongoDb')
 const ContenedorFirebase = require('./contenedores/ContenedorFirebase')
 
 let envVars = process.env.DATABASE
 app.use('/api/productos-test', routerProductos)
 
+const { usuariosModel } = require('./models/usuarios');
+
 
 routerProductos.use(express.json())
 routerProductos.use(express.urlencoded({extended:true}))
+app.use(express.json())
+app.use(express.urlencoded({extended:true}))
 
 const conector = envVars === 'FIREBASE' ? new ContenedorFirebase() : envVars === 'MONGO' ? new ContenedorMongoDb() : null
 
@@ -35,227 +56,325 @@ conector.connect()
 app.use(express.static('public'))
 
 
-app.use(session({
-    /* ----------------------------------------------------- */
-    /*           Persistencia por redis database             */
-    /* ----------------------------------------------------- */
-    // Para Mongo Atlas cambiar URL por la del cluster de atlas
-    store: MongoStore.create({ mongoUrl: 'mongodb://localhost/sesiones' }),
-    /* ----------------------------------------------------- */
+// app.use(session({
+//     /* ----------------------------------------------------- */
+//     /*           Persistencia por redis database             */
+//     /* ----------------------------------------------------- */
+//     // Para Mongo Atlas cambiar URL por la del cluster de atlas
+//     store: MongoStore.create({ mongoUrl: 'mongodb://localhost/sesiones' }),
+//     /* ----------------------------------------------------- */
 
-    secret: 'shhhhhhhhhhhhhhhhhhhhh',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        maxAge: 40000
-    } 
-}))
-
-
-
-
-let messages = []
-
-const getMensajes = async () =>{
-    try {
-    //    return await knex.from('messages').select('*') 
-     return conector.getAll()
-       
-            
-
-    } catch (e) {
-        return e;
-    }
-}
-
-const insertMensajes = async (data) =>{
-    try {
-    //    const mensaje =  await knex('messages').insert(data)
-
-       conector.postMensaje(data)
-
-    //    console.log('data',data)
-            
-
-    } catch (e) {
-        return e;
-    }
-}
+//     secret: 'shhhhhhhhhhhhhhhhhhhhh',
+//     resave: false,
+//     saveUninitialized: false,
+//     cookie: {
+//         maxAge: 40000
+//     } 
+// }))
 
 
 
 
+// io.on('connection', async (socket) => {
+//     console.log('Un cliente se ha conectado al chat')
+//     // socket.emit('messages', messages); // emitir todos los mesajes a lun cliente nuevo
 
-io.on('connection', async (socket) => {
-    console.log('Un cliente se ha conectado al chat')
-    // socket.emit('messages', messages); // emitir todos los mesajes a lun cliente nuevo
+//     socket.emit('messages',  await getMensajes())
 
-    socket.emit('messages',  await getMensajes())
+//     // console.log(await getMensajes())
 
-    // console.log(await getMensajes())
+//     socket.on('new-message', function(data) {
+//         messages.push(data)
+//         io.sockets.emit('messages', messages)
+//     })
 
-    socket.on('new-message', function(data) {
-        messages.push(data)
-        io.sockets.emit('messages', messages)
-    })
-
-    socket.on('new-message',  async (data)=> {
+//     socket.on('new-message',  async (data)=> {
      
-        await insertMensajes(data)
+//         await insertMensajes(data)
 
-        // console.log('lo que llega',data)
-
-
-        socket.emit('messages',  await getMensajes())// emitir todos los mesajes a lun cliente nuevo
+//         // console.log('lo que llega',data)
 
 
-    })
+//         socket.emit('messages',  await getMensajes())// emitir todos los mesajes a lun cliente nuevo
+
+
+//     })
 
 
 
-});
+// });
 
 // -----------------------------------DESAFIO LOGIN--------------------------------------------
 
 
 
-app.get('/servidor', (req,res) => {
-    res.send('servidor ok')
-} )
+// app.get('/login/:nombre/:clave', async (req, res) => {
 
-// let contador = 0
-// app.get('/sin-session', (req, res) => {
-//     res.send({ contador: ++contador })
+//     let nombre = req.params.nombre
+//     let clave = req.params.clave
+
+//     try {
+//         let usuario = await usuariosModel.find({nombre: req.params.nombre})
+//         // console.log(productos)
+//         console.log(req);
+
+//         res.json(usuario)
+        
+//     } catch (error) {
+//         res.json(error)
+//     }
+     
+
+    
+
 // })
 
-app.get('/con-session', (req, res) => {
-    if (req.session.contador) {
-        req.session.contador++
-        res.send(`Ud ha visitado el sitio ${req.session.contador} veces.`)
-    }
-    else {
-        req.session.contador = 1
-        res.send('Bienvenido!')
-    }
-})
+// app.get('/logout', (req, res) => {
 
-app.get('/nombreUsuario',cors(), (req,res) => {
-  
-    if(req.session.usuario){
-        res.json({nombre:req.session.usuario})
+//    let nombre =  req.session.usuario
+
+//     req.session.destroy(err => {
+//         if (!err) res.send(` ${nombre} estas desconectad@ <a href="http://localhost:8080/" > volver </a> `)
+//         else res.send({ status: 'Logout ERROR', body: err })
+//     })
+// })
 
 
-    } else {
-        res.json('no logeado')
-    }
 
-})
 
-// let login = 0
 
-app.get('/login/:nombre', (req, res) => {
+// app.post('/register/:nombre/:clave', async(req, res) => {
+     
+//     let nombre = req.params.nombre
+//     let clave = req.params.clave
+     
+//     console.log(nombre,clave)
 
-    console.log(req.params.nombre)
+   
+//         try {
+//             const usuario = {nombre:req.params.nombre,
+//                              clave:req.params.clave}
+//             const usuariosSaveModel = new usuariosModel(usuario)
+//             let usuariosSave = await usuariosSaveModel.save()
+//             console.log(usuariosSave)
+         
+            
+//         } catch (error) {
+//             console.log(error)
+//         }
+    
+    
+
+//     res.json({nombre:nombre})
+
 
     
 
-    if (req.session.login) {
-      
 
-        res.send(`estas logeado? ${req.session.login}`)
-        // res.json('logeado')
-        
-          
-    }
-    else {
-        req.session.login = true
-        req.session.usuario= req.params.nombre
-        // res.send(`Bienvenido ${req.params.nombre} , estas logeado`)
-        res.send(`Bienvenido ${req.params.nombre} , estas logeado <a href="http://localhost:8080/" > volver </a> `)
+
+
+// passport.use('registrrr', new LocalStrategy({
+//     passReqToCallback:true
+// },   (req, username, password ,done) => {
+
+//     console.log(username)
+
+//     const {direccion} = req.body
+
+//      const usuario = usuarios.find(usuario => usuario.username == username )
+
+   
+
+     
+//      const user = {
+//         username,
+//         password,
+//         direccion
+//      }
+
+//      usuarios.push(user)
+
+//      console.log(usuarios)
+
+
+//      return done(null, user)
+
+     
+
+
+
+// } ) )
+
+
+    
+// })
+passport.use('register', new LocalStrategy({
+    passReqToCallback:true
+},  async (req, username, password ,done) => {
+
+   
+
+     const usuario = await usuariosModel.findOne({ 'nombre': username })
+
+     console.log('ola',usuario)
+
+     if(usuario){
+        console.log('registrado')
+        return done('already registered')
+     }
+
+     try {
+        const usuario = {nombre:username,
+                         clave:password}
+        const usuariosSaveModel = new usuariosModel(usuario)
+        let usuariosSave = await usuariosSaveModel.save()
+        console.log('esta',usuariosSave)
+
+
+     return done(null, usuario)
 
         
+    } catch (error) {
+        console.log(error)
     }
+
+
+
+
+} ) )
+passport.use('login', new LocalStrategy( async (username, password ,done) => {
+
+   
+
+     const usuario = await usuariosModel.findOne({ 'nombre': username })
+
+   
+
+     if(!usuario){
+        console.log('no existe usuario')
+        return done(null,false)
+     }
+     
+     if(usuario.clave != password ){
+       return done(null,false)
+
+     }
+
+
+     return done(null, usuario)
+
+
+
+
+} ) )
+
+
+
+
+
+app.post('/register', passport.authenticate('register', {failureRedirect:'/failureRegister', successRedirect:'/home'} ) )
+
+
+app.get('/failureRegister', (req, res) => {
+
+    
+    
+        res.send('error al registrarse')
+
+  
+    
 })
 
-app.get('/logout', (req, res) => {
+app.post('/login', passport.authenticate('login', {failureRedirect:'/failureLogin', successRedirect:'/home'} ) )
 
-   let nombre =  req.session.usuario
+app.get('/failureRegister', (req, res) => {
 
-    req.session.destroy(err => {
-        if (!err) res.send(` ${nombre} estas desconectad@ <a href="http://localhost:8080/" > volver </a> `)
-        else res.send({ status: 'Logout ERROR', body: err })
-    })
+    
+    
+    res.send('error al iniciar sesion')
+
+
+
 })
+
+
 
 app.get('/home', (req, res) => {
-    if (req.session.login) {
-        res.send(`Bienvenido! ${req.session.usuario} ESTAS LOGEADO`)
+   
+        res.send(`Bienvenido! ${req.session.passport.user.nombre} ESTAS LOGEADO`)
 
-        console.log('viene')
-    } else {
-       res.send('no estas logeado')
-    }
+        console.log('ESTO',req.session.passport.user.nombre)
+   
+
     
 })
 
 
+passport.serializeUser(function(user,done){
+    done(null, user)
+})
+
+passport.deserializeUser(function(username,done){
+    const usuario = usuariosModel.findOne({'nombre':username})
+    done(null, usuario)
+})
 
 
 
 // -----------------------------------------------------------------------------
 
 
-routerProductos.get('/',cors(), async (req,res) => {
+// routerProductos.get('/',cors(), async (req,res) => {
     
-    let respuesta = [{
-        nombre:'',
-        precio:faker.commerce.price(100)
-    }]
+//     let respuesta = [{
+//         nombre:'',
+//         precio:faker.commerce.price(100)
+//     }]
 
-    for (let i = 0; i < 5; i++) {
-         respuesta[i]= {
-             nombre:faker.commerce.product(),
-             precio:faker.commerce.price(100),
-             foto:faker.image.imageUrl()
+//     for (let i = 0; i < 5; i++) {
+//          respuesta[i]= {
+//              nombre:faker.commerce.product(),
+//              precio:faker.commerce.price(100),
+//              foto:faker.image.imageUrl()
 
-        }
+//         }
         
-    }
+//     }
 
-    res.json(respuesta)
+//     res.json(respuesta)
 
  
 
   
-} )
+// } )
 
 
 
 
 
-const getProducts = async () =>{
-    try {
-       return  await knex.from('products').select('*')
+// const getProducts = async () =>{
+//     try {
+//        return  await knex.from('products').select('*')
 
-       console.log({productos})
+//        console.log({productos})
             
 
-    } catch (e) {
-        return e;
-    }
-}
+//     } catch (e) {
+//         return e;
+//     }
+// }
 
-const insertProducts = async (data) =>{
-    try {
-       const productos =  await knex('products').insert(data)
+// const insertProducts = async (data) =>{
+//     try {
+//        const productos =  await knex('products').insert(data)
 
-       console.log(productos)
+//        console.log(productos)
             
 
-    } catch (e) {
-        return e;
-    }
-}
+//     } catch (e) {
+//         return e;
+//     }
+// }
 
 
 // io.on('connection',  async (socket) => {
@@ -306,39 +425,39 @@ const insertProducts = async (data) =>{
 // });
 
 
-const productos = [{
-    "title":"Celular",
-    "precio":30000,
-    "thumbnail":"fotoCelular.jpg",
-    "id":1
-},{
-    "title":"Computador",
-    "precio":50000,
-    "thumbnail":"fotoComputador.jpg",
-    "id":2
-},{
-    "title":"Teclado",
-    "precio":10000,
-    "thumbnail":"fotoTeclado.jpg",
-    "id":3
-}
-]
+// const productos = [{
+//     "title":"Celular",
+//     "precio":30000,
+//     "thumbnail":"fotoCelular.jpg",
+//     "id":1
+// },{
+//     "title":"Computador",
+//     "precio":50000,
+//     "thumbnail":"fotoComputador.jpg",
+//     "id":2
+// },{
+//     "title":"Teclado",
+//     "precio":10000,
+//     "thumbnail":"fotoTeclado.jpg",
+//     "id":3
+// }
+// ]
 
 
-app.get('/productos', (req,res) => {
+// app.get('/productos', (req,res) => {
 
-    res.render('productos',{productos})
-} )
+//     res.render('productos',{productos})
+// } )
 
 
-app.post('/productos', (req,res) => {
+// app.post('/productos', (req,res) => {
 
-    productos.push(req.body)
-    productos[productos.length-1].id = productos.length
+//     productos.push(req.body)
+//     productos[productos.length-1].id = productos.length
 
-    res.render('productos',{productos: productos})
+//     res.render('productos',{productos: productos})
 
-} )
+// } )
 
 
 
