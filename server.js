@@ -15,6 +15,17 @@ const routerProductos = express.Router()
 const passport = require('passport')
 const {Strategy: LocalStrategy} = require('passport-local')
 
+const yargs = require('yargs/yargs')(process.argv.slice(2))
+
+const {puerto} = yargs.
+    alias({
+        p:'puerto'
+    }).
+    default({
+        puerto:8080
+    }).argv
+
+    console.log(puerto)
 
 app.use(session({
     secret:'shhhhhhhhhhhh',
@@ -38,6 +49,7 @@ let envVars = process.env.DATABASE
 app.use('/api/productos-test', routerProductos)
 
 const { usuariosModel } = require('./models/usuarios');
+// const { clearGlobalAppDefaultCred } = require('firebase-admin/lib/app/credential-factory')
 
 
 routerProductos.use(express.json())
@@ -298,6 +310,24 @@ app.get('/failureRegister', (req, res) => {
 })
 
 
+app.get('/info', (req,res) =>{
+
+    res.send(`
+    
+    carpeta del proyecto :  ${process.argv[1]}:  </br>
+    sistema operativo     : ${process.platform}: </br>
+    version node     : ${process.version}: </br>
+    memoria total reservada    : ${process.memoryUsage().rss}: </br>
+    process id   : ${process.pid}: </br>
+    process path   : ${process.cwd()}: </br>
+    process args   : ${process.argv}: </br>
+               
+    
+            `)
+
+} )
+
+
 
 app.get('/home', (req, res) => {
    
@@ -463,7 +493,7 @@ passport.deserializeUser(function(username,done){
 
 
 
-const PORT = 8080;
+const PORT = puerto;
 
 const srv = server.listen(PORT, () => {
     console.log(`servidor escuchando en el puerto ${srv.address().port}`)

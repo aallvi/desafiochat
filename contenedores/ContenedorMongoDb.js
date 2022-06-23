@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 const { mensajesModel } = require('../models/mensajes');
 const util = require('util')
  
-const {normalize, denormalize, schema} = require('normalizr')
+const {normalize, denormalize, schema} = require('normalizr');
+const { USUARIO, CLAVE } = require('../config');
 
 const authorsSchema = new schema.Entity('author');
 
@@ -21,7 +22,7 @@ class ContenedorMongoDb {
 
     async connect(){
         try{
-            const url = 'mongodb+srv://alvi:12qwaszx@cafecluster.agk3g.mongodb.net/ecommerce?retryWrites=true&w=majority'
+            const url = `mongodb+srv://alvi:12qwaszx@cafecluster.agk3g.mongodb.net/ecommerce?retryWrites=true&w=majority`
             let rta = await mongoose.connect(url)
             console.log('base de datos conectada MONGO')
         } catch(err) {
