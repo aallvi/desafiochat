@@ -105,3 +105,9 @@ html, body{
 .bienvenido{
     font-size: 2rem;
 }
+
+.boton{
+    display: inline-block;
+    margin: 0 auto;
+    font-size: 2rem;
+}

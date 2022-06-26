@@ -45,6 +45,7 @@ routerProductos.use(express.urlencoded({extended:true}))
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
+
 const conector = envVars === 'FIREBASE' ? new ContenedorFirebase() : envVars === 'MONGO' ? new ContenedorMongoDb() : null
 
 conector.connect()
@@ -268,7 +269,14 @@ passport.use('login', new LocalStrategy( async (username, password ,done) => {
 
 } ) )
 
-
+app.get('/', (req, res) => {
+    if (req.isAuthenticated()) {
+        res.redirect('/home')
+    }
+    else {
+        res.redirect('/login')
+    }
+})
 
 
 

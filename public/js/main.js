@@ -9,8 +9,8 @@ const myBtn = document.getElementById("myBtn")
 myBtn.addEventListener('click', function() {
     // var inputText =event.path[0].value
 
-    // console.log(document.getElementById("clave").value)
-    // console.log(document.getElementById("nombre").value)
+    console.log(document.getElementById("clave").value)
+    console.log(document.getElementById("nombre").value)
 
     let nombre = document.getElementById("nombre").value
     let clave = document.getElementById("clave").value
@@ -58,8 +58,7 @@ const myBtnInicio = document.getElementById("myBtnInicio")
 myBtnInicio.addEventListener('click', function() {
     // var inputText =event.path[0].value
 
-    // console.log(document.getElementById("clave").value)
-    // console.log(document.getElementById("nombre").value)
+
 
     let nombre = document.getElementById("textoLogin").value
     let clave = document.getElementById("claveLogin").value

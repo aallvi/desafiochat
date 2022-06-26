@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APP CHAT</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    
+</head>
+<body>
+
+    <div class="contenedor">
+
+        
+        <p class="titulo">Formulario de ingreso de productos</p>
+
+      
+    <!-- <form class="productosingreso" action="/productos" method="POST" >
+        Nombre: <input type="text" name="title">
+        Precio: <input type="text" name="precio">
+        URL Foto : <input type="text" name="thumbnail" >
+        
+        <button class="btn btn-primary my-2" > Guardar </button>
+
+
+    </form> -->
+
+    <form class="form-inline productosingreso" onsubmit="return addProducto()" autocomplete="off">
+        <input type="text" id="nombre" class="form-control my-2 mr-2" placeholder="Nombre">
+        <input type="text" id="precio" class="form-control my-2 mr-2" placeholder="Precio">
+        <input type="text" id="foto" class="form-control my-2 mr-2" placeholder="Foto url">
+        
+        <input class="btn btn-primary my-2" type="submit" value="Agregar Producto">
+ 
+ 
+     
+     </form>
+
+    <div id="products" ></div>
+
+
+    
+    
+    <p class="tituloChat">Chat</p>
+
+    <div id="messages" ></div>
+
+
+    <div class="contenedorChat" >
+
+
+        <form class="form-inline " onsubmit="return addMessage()" autocomplete="off">
+           <input type="text" id="id" class="form-control my-2 mr-2" placeholder="Tu Mail">
+           <input type="text" id="name" class="form-control my-2 mr-2" placeholder="Nombre">
+           <input type="text" id="apellido" class="form-control my-2 mr-2" placeholder="Apellido">
+           <input type="text" id="edad" class="form-control my-2 mr-2" placeholder="edad">
+           <input type="text" id="alias" class="form-control my-2 mr-2" placeholder="alias">
+           <input type="text" id="avatar" class="form-control my-2 mr-2" placeholder="avatar">
+           <input type="text" id="men" class="form-control my-2 mr-2" placeholder="cuentanos algo...">
+           
+           <input class="btn btn-primary my-2" type="submit" value="Enviar!">
+    
+    
+        
+        </form>
+
+    </div>
+
+
+    </div>
+
+    
+    <script src="./js/main.js" ></script>
+   
+
+  
+</body>
+</html>
