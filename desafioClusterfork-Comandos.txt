@@ -1,0 +1,50 @@
+para iniciar modo cluster
+
+node server.js -c true
+
+iniciar modo fork
+
+node server.js 
+
+con nodemon en cluster
+
+nodemon server.js -c true
+
+con nodemon en fork
+
+nodemon server.js
+
+
+con forever
+
+forever server.js
+
+listar 
+
+forever list
+
+-------- pm2---
+
+modo fork
+
+pm2 start server.js --name="servidorCoder" --watch -- 8089
+
+modo cluster
+
+pm2 start server.js --name="servidorCoder" --watch -i max -- 8089
+
+listar
+
+pm2 list
+
+
+
+----- verificar finalizacion de procesos---
+taskkill /pid 39248 /f  
+
+
+
+corremos nginx 
+pm2 start server.js --name="servidorCoder" --watch -i max -- 8081
+
+entramos a /api/random y vemos que balancea la carga equitativamente
