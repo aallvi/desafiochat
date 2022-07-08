@@ -7,6 +7,10 @@ const cors = require('cors');
 const { faker } = require('@faker-js/faker');
 faker.locale = 'es'
 
+const clusterOn = require('cluster')
+
+const numCpus = require('os').cpus().length
+
 const session = require('express-session')
 // Comentar una de las siguientes para probar el funcionamiento de la otra, sqlite y mysql
 const routerProductos = express.Router()
@@ -17,15 +21,17 @@ const {Strategy: LocalStrategy} = require('passport-local')
 
 const yargs = require('yargs/yargs')(process.argv.slice(2))
 
-const {puerto} = yargs.
+const {puerto,cluster} = yargs.
     alias({
-        p:'puerto'
+        p:'puerto',
+        c:'cluster'
     }).
     default({
-        puerto:8080
+        puerto:8081,
+        cluster:false
     }).argv
 
-    console.log(puerto)
+    console.log(cluster)
 
 app.use(session({
     secret:'shhhhhhhhhhhh',
@@ -36,11 +42,45 @@ app.use(session({
     }
 }))
 
+// console.log(yargs.c)
+
 
 
 app.use(passport.initialize())
 app.use(passport.session())
 // const {knex} = require('./db/database')
+
+if(cluster && clusterOn.isMaster){
+    console.log('cluster')
+    console.log(numCpus)
+    console.log(`PID MASTER ${process.pid} `)
+
+       for (let i = 0; i < numCpus; i++) {
+        clusterOn.fork()
+        
+       }
+
+       clusterOn.on('exit',worker => {
+        console.log('worker', worker.process.pid,'died', new Date().toLocaleString())
+        clusterOn.fork()
+       })
+}else {
+    console.log('fork')
+
+    const PORT = parseInt(process.argv[2]) || 8085
+
+    app.get('/fork' , (req,res) => {
+        res.send(`servidor express en ${PORT} - PID ${process.pid}  `)
+    } )
+
+    app.listen(PORT , err => {
+        if(!err) console.log(`servidor express en ${PORT} - PID ${process.pid}  `)
+    })
+
+
+}
+
+
 
 const ContenedorMongoDb = require('./contenedores/ContenedorMongoDb')
 const ContenedorFirebase = require('./contenedores/ContenedorFirebase')
@@ -65,7 +105,7 @@ conector.connect()
 
 
 
-app.use(express.static('public'))
+// app.use(express.static('public'))
 
 
 // app.use(session({
@@ -280,7 +320,18 @@ passport.use('login', new LocalStrategy( async (username, password ,done) => {
 
 } ) )
 
+const PORT = parseInt(process.argv[2]) || 8080
 
+
+app.get('/api/random', (req, res) => {
+
+    
+    
+    res.send(` corriendo nginx ${PORT}`)
+
+
+
+})
 
 
 
@@ -321,7 +372,7 @@ app.get('/info', (req,res) =>{
     process id   : ${process.pid}: </br>
     process path   : ${process.cwd()}: </br>
     process args   : ${process.argv}: </br>
-               
+    numero procesos : ${numCpus}</br>
     
             `)
 
