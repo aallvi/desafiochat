@@ -43,7 +43,8 @@ app.use(session({
         maxAge: 6000
     }
 }))
-
+app.use(express.json())
+app.use(express.urlencoded({extended:true}))
 // console.log(yargs.c)
 
 // LOGER ===================================================================
@@ -295,13 +296,6 @@ app.get('/logout', (req, res) => {
 
 // } ) )
 
-app.get('*' , (req,res) => {
-    const {url, method} = req
-    logger.warn(`ruta ${method} ${url} no existe `)
-
-    logger.info(`ruta ${method} ${url} `)
-    res.send(`ruta ${method} ${url} no existe `)
-} )
 
 
     
@@ -417,7 +411,9 @@ app.get('/failureRegister', (req, res) => {
 
 
 app.get('/info', compression(), (req,res) =>{
-
+    const {url, method} = req
+    logger.info(`ruta ${method} ${url} `)
+   
     res.send(`
     
     carpeta del proyecto :  ${process.argv[1]}:  </br>
@@ -574,6 +570,13 @@ io.on('connection',  async (socket) => {
 
 // } )
 
+app.get('*' , (req,res) => {
+    const {url, method} = req
+    logger.warn(`ruta ${method} ${url} no existe `)
+
+    logger.info(`ruta ${method} ${url} `)
+    res.send(`ruta ${method} ${url} no existe `)
+} )
 
 
 
