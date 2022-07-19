@@ -1,0 +1,3 @@
+[2022-07-19T19:06:54.138] [WARN] default - ruta GET /infoo no existe 
+[2022-07-19T19:17:49.774] [WARN] default - ruta GET / no existe 
+[2022-07-19T19:17:53.352] [WARN] default - ruta GET /home no existe 

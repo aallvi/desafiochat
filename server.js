@@ -8,12 +8,14 @@ const { faker } = require('@faker-js/faker');
 faker.locale = 'es'
 
 const clusterOn = require('cluster')
+const log4js= require("log4js")
 
 const numCpus = require('os').cpus().length
 
 const session = require('express-session')
 // Comentar una de las siguientes para probar el funcionamiento de la otra, sqlite y mysql
 const routerProductos = express.Router()
+const compression = require('compression')
 
 
 const passport = require('passport')
@@ -43,6 +45,41 @@ app.use(session({
 }))
 
 // console.log(yargs.c)
+
+// LOGER ===================================================================
+
+log4js.configure({
+
+  appenders:{
+   consola:{type:'console'},
+   archivoErrores: {type:'file', filename: 'error.log'},
+   archivoWarn:{type:'file', filename: 'warn.log'},
+   loggerConsola: {type:'logLevelFilter', appender:'consola', level:'info'},
+   loggerArchivoErrores:{type:'logLevelFilter', appender:'archivoErrores', level:'error'},
+   loggerArchivoWarn:{type:'logLevelFilter', appender:'archivoWarn', level:'warn'},
+
+  },
+  categories:{
+    default:{
+        appenders: ['loggerConsola','loggerArchivoErrores','loggerArchivoWarn'], level:'all'
+    }
+  }
+
+
+})
+
+module.exports = logger = log4js.getLogger();
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -160,36 +197,37 @@ conector.connect()
 
 
 
-// app.get('/login/:nombre/:clave', async (req, res) => {
+app.get('/login/:nombre/:clave', async (req, res) => {
 
-//     let nombre = req.params.nombre
-//     let clave = req.params.clave
+    let nombre = req.params.nombre
+    let clave = req.params.clave
 
-//     try {
-//         let usuario = await usuariosModel.find({nombre: req.params.nombre})
-//         // console.log(productos)
-//         console.log(req);
+    try {
+        let usuario = await usuariosModel.find({nombre: req.params.nombre})
+        // console.log(productos)
+        console.log(req);
 
-//         res.json(usuario)
+        res.json(usuario)
         
-//     } catch (error) {
-//         res.json(error)
-//     }
+    } catch (error) {
+        res.json(error)
+        logger.error(error)
+    }
      
 
     
 
-// })
+})
 
-// app.get('/logout', (req, res) => {
+app.get('/logout', (req, res) => {
 
-//    let nombre =  req.session.usuario
+   let nombre =  req.session.usuario
 
-//     req.session.destroy(err => {
-//         if (!err) res.send(` ${nombre} estas desconectad@ <a href="http://localhost:8080/" > volver </a> `)
-//         else res.send({ status: 'Logout ERROR', body: err })
-//     })
-// })
+    req.session.destroy(err => {
+        if (!err) res.send(` ${nombre} estas desconectad@ <a href="http://localhost:8080/" > volver </a> `)
+        else res.send({ status: 'Logout ERROR', body: err })
+    })
+})
 
 
 
@@ -257,6 +295,14 @@ conector.connect()
 
 // } ) )
 
+app.get('*' , (req,res) => {
+    const {url, method} = req
+    logger.warn(`ruta ${method} ${url} no existe `)
+
+    logger.info(`ruta ${method} ${url} `)
+    res.send(`ruta ${method} ${url} no existe `)
+} )
+
 
     
 // })
@@ -288,6 +334,8 @@ passport.use('register', new LocalStrategy({
         
     } catch (error) {
         console.log(error)
+        logger.error(error)
+
     }
 
 
@@ -296,7 +344,8 @@ passport.use('register', new LocalStrategy({
 } ) )
 passport.use('login', new LocalStrategy( async (username, password ,done) => {
 
-   
+    const {url, method} = req
+    logger.info(`ruta ${method} ${url} `)
 
      const usuario = await usuariosModel.findOne({ 'nombre': username })
 
@@ -320,12 +369,13 @@ passport.use('login', new LocalStrategy( async (username, password ,done) => {
 
 } ) )
 
-const PORT = parseInt(process.argv[2]) || 8080
+// const PORT = parseInt(process.argv[2]) || 8080
 
 
 app.get('/api/random', (req, res) => {
 
-    
+    const {url, method} = req
+    logger.info(`ruta ${method} ${url} `)
     
     res.send(` corriendo nginx ${PORT}`)
 
@@ -340,7 +390,8 @@ app.post('/register', passport.authenticate('register', {failureRedirect:'/failu
 
 app.get('/failureRegister', (req, res) => {
 
-    
+    const {url, method} = req
+    logger.info(`ruta ${method} ${url} `)
     
         res.send('error al registrarse')
 
@@ -351,17 +402,21 @@ app.get('/failureRegister', (req, res) => {
 app.post('/login', passport.authenticate('login', {failureRedirect:'/failureLogin', successRedirect:'/home'} ) )
 
 app.get('/failureRegister', (req, res) => {
+    
+    const {url, method} = req
+    logger.info(`ruta ${method} ${url} `)
+    
 
     
     
     res.send('error al iniciar sesion')
 
-
+    logger.error('error al iniciar sesion')
 
 })
 
 
-app.get('/info', (req,res) =>{
+app.get('/info', compression(), (req,res) =>{
 
     res.send(`
     
@@ -381,6 +436,8 @@ app.get('/info', (req,res) =>{
 
 
 app.get('/home', (req, res) => {
+    const {url, method} = req
+    logger.info(`ruta ${method} ${url} `)
    
         res.send(`Bienvenido! ${req.session.passport.user.nombre} ESTAS LOGEADO`)
 
@@ -433,69 +490,44 @@ passport.deserializeUser(function(username,done){
 
 
 
-// const getProducts = async () =>{
-//     try {
-//        return  await knex.from('products').select('*')
-
-//        console.log({productos})
-            
-
-//     } catch (e) {
-//         return e;
-//     }
-// }
-
-// const insertProducts = async (data) =>{
-//     try {
-//        const productos =  await knex('products').insert(data)
-
-//        console.log(productos)
-            
-
-//     } catch (e) {
-//         return e;
-//     }
-// }
 
 
-// io.on('connection',  async (socket) => {
+io.on('connection',  async (socket) => {
 
-//     console.log('Un cliente se ha conectado')
+    console.log('Un cliente se ha conectado')
 
 
 
-//     socket.emit('products',  await getProducts())// emitir todos los mesajes a lun cliente nuevo
+    socket.emit('products',  await getProducts())// emitir todos los mesajes a lun cliente nuevo
 
   
 
-//     socket.on('new-product',  async (dataProduct)=> {
+    socket.on('new-product',  async (dataProduct)=> {
      
-//         await insertProducts(dataProduct)
+        await insertProducts(dataProduct)
 
 
-//         socket.emit('products',  await getProducts())// emitir todos los mesajes a lun cliente nuevo
+        socket.emit('products',  await getProducts())// emitir todos los mesajes a lun cliente nuevo
 
 
 
         
-//         // knex.from('productos').select('*')
-//         // .then(rows => {
-//         //     for (row of rows){
-//         //         products.push({id: `${row['id']}`, nombre:`${row['nombre']}`, precio:`${row['precio']}`})
-//         //         io.sockets.emit('products', products)
+        // knex.from('productos').select('*')
+        // .then(rows => {
+        //     for (row of rows){
+        //         products.push({id: `${row['id']}`, nombre:`${row['nombre']}`, precio:`${row['precio']}`})
+        //         io.sockets.emit('products', products)
 
-//         //     }
-//         //     console.log(products)
-//         // io.sockets.emit('products', products)
+        //     }
+        //     console.log(products)
+        // io.sockets.emit('products', products)
 
-//         // } ).catch(err => {console.log(err); throw err })
-//         // .finally(() => {
-//         //     knex.destroy()
-//         // } )
+        // } ).catch(err => {console.log(err); throw err })
+        // .finally(() => {
+        //     knex.destroy()
+        // } )
 
-//     })
-
-
+    })
 
 
 
@@ -503,7 +535,9 @@ passport.deserializeUser(function(username,done){
 
 
 
-// });
+
+
+});
 
 
 // const productos = [{

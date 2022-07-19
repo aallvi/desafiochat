@@ -4,6 +4,7 @@ const util = require('util')
  
 const {normalize, denormalize, schema} = require('normalizr');
 const { USUARIO, CLAVE } = require('../config');
+const { logger } = require('../server');
 
 const authorsSchema = new schema.Entity('author');
 
@@ -27,6 +28,7 @@ class ContenedorMongoDb {
             console.log('base de datos conectada MONGO')
         } catch(err) {
             console.log(err)
+            logger.error(error)
         }
     }
 
@@ -39,7 +41,7 @@ class ContenedorMongoDb {
             return mensajes
             // return JSON.parse(productos)
         } catch (error) {
-           
+            logger.error(error)
         }
     }
 
@@ -52,6 +54,7 @@ class ContenedorMongoDb {
             res.json(productos)
         } catch (error) {
             res.json(error)
+            logger.error(error)
         }
     }
 
@@ -66,6 +69,7 @@ class ContenedorMongoDb {
             
         } catch (error) {
             console.log(error)
+            logger.error(error)
         }
     
     }
@@ -88,6 +92,7 @@ class ContenedorMongoDb {
   
       } catch (error) {
           console.log(error)
+          logger.error(error)
       }
   
 
@@ -100,6 +105,7 @@ class ContenedorMongoDb {
             res.json('borrado')
         } catch (error) {
             res.json(error)
+            logger.error(error)
         }
     }
 
