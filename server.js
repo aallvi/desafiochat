@@ -371,7 +371,7 @@ app.get('/api/random', (req, res) => {
     const {url, method} = req
     logger.info(`ruta ${method} ${url} `)
     
-    res.send(` corriendo nginx ${PORT}`)
+    // res.send(` corriendo nginx ${PORT}`)
 
 
 
@@ -412,7 +412,18 @@ app.get('/failureRegister', (req, res) => {
 
 app.get('/info', compression(), (req,res) =>{
     const {url, method} = req
+
+
     logger.info(`ruta ${method} ${url} `)
+
+    console.log(`   carpeta del proyecto :  ${process.argv[1]}:  </br>
+    sistema operativo     : ${process.platform}: </br>
+    version node     : ${process.version}: </br>
+    memoria total reservada    : ${process.memoryUsage().rss}: </br>
+    process id   : ${process.pid}: </br>
+    process path   : ${process.cwd()}: </br>
+    process args   : ${process.argv}: </br>
+    numero procesos : ${numCpus}</br>`)
    
     res.send(`
     

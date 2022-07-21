@@ -17,3 +17,5 @@
 [2022-07-19T19:27:49.505] [WARN] default - ruta GET /info no existe 
 [2022-07-19T19:27:52.284] [WARN] default - ruta GET /info no existe 
 [2022-07-19T19:31:33.775] [WARN] default - ruta GET / no existe 
+[2022-07-21T18:30:04.686] [WARN] default - ruta GET /favicon.ico no existe 
+[2022-07-21T18:30:09.937] [WARN] default - ruta GET /favicon.ico no existe 
